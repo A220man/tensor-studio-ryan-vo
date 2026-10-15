@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "name": "tensor-studio-ryan-vo",
+  "owner": "A220man",
+  "email": "ryandtvo@gmail.com",
+  "domain": "AI/ML developer tools",
+  "workflows": [
+    "Browse and search Claude Code plugins by category, author, tags, and LSP availability",
+    "Generate per-plugin .lsp.json configuration files fixing marketplace install issue #379",
+    "Plugin detail view with installation commands, source links, and LSP server configuration"
+  ],
+  "auth": "oidc-keycloak-saml-broker",
+  "llm_providers": [
+    "openai-compatible",
+    "anthropic",
+    "gemini",
+    "ollama"
+  ],
+  "summary": "Work in progress: tensor-studio-ryan-vo",
+  "status": "work-in-progress"
+}
