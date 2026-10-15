@@ -1,0 +1,64 @@
+name: tensor-studio
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: tensor-studio-backend:latest
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./data/marketplace.db
+      - CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+    volumes:
+      - backend-data:/app/data
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        - VITE_API_URL=http://127.0.0.1:8000/api/v1
+    image: tensor-studio-frontend:latest
+    ports:
+      - "127.0.0.1:5173:80"
+    environment:
+      - VITE_API_URL=http://127.0.0.1:8000/api/v1
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:80/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.7
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=sqlite
+      - KC_DB_URL=jdbc:sqlite:/opt/keycloak/data/keycloak.db
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/realms/master"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
+volumes:
+  backend-data:
+  keycloak-data:
