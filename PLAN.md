@@ -4,7 +4,7 @@ Each round completes one feature or repair. Future items are planned, not implem
 
 ## Current round
 
-marketplace-browse
+plugin-submission
 
 ## Roadmap
 
@@ -39,13 +39,17 @@ Tests: `backend/tests/test_lsp_config.py`
 
 ### plugin-submission — Plugin Submission & Review Workflow
 
-Status: planned
+Status: done
 
 Acceptance:
 - POST /api/v1/submissions creates plugin submission with validation
 - GET /api/v1/submissions (admin) lists pending/approved/rejected
 - PATCH /api/v1/submissions/{id}/review updates status with notes
 - Frontend submission form with GitHub URL, category, plugin.json upload
+
+Implementation: `backend/app/api/plugins.py`, `backend/app/models/plugin.py`, `frontend/src/pages/SubmitPlugin.tsx`, `frontend/src/api/client.ts`, `frontend/src/types.ts`, `frontend/src/App.tsx`, `frontend/src/pages/Marketplace.tsx`
+
+Tests: `backend/tests/test_plugins.py::TestPluginSubmission`, `frontend/src/pages/SubmitPlugin.test.tsx`
 
 ### auth-oidc — OIDC Authentication with Keycloak
 

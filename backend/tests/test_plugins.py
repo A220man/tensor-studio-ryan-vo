@@ -166,3 +166,201 @@ class TestSearchFiltering:
         assert data["total"] >= 1
         for item in data["items"]:
             assert "Microsoft" in item["author"]
+class TestPluginSubmission:
+    def test_create_submission_success(self, client):
+        payload = {
+            "submitter_name": "Test User",
+            "submitter_email": "test@example.com",
+            "source_url": "https://github.com/test/new-plugin",
+            "proposed_category": "lsp",
+            "proposed_config": {
+                "name": "Test Plugin",
+                "slug": "test-plugin",
+                "description": "A test plugin",
+                "version": "1.0.0",
+                "author": "Test User",
+                "tags": ["test"],
+            },
+        }
+        resp = client.post("/api/v1/submissions", json=payload)
+        assert resp.status_code == status.HTTP_201_CREATED
+        data = resp.json()
+        assert data["submitter_name"] == "Test User"
+        assert data["submitter_email"] == "test@example.com"
+        assert data["source_url"] == "https://github.com/test/new-plugin"
+        assert data["proposed_category"] == "lsp"
+        assert data["status"] == "pending"
+        assert data["id"] is not None
+
+    def test_create_submission_duplicate_source_url_rejected(self, client):
+        payload = {
+            "submitter_name": "Test User",
+            "submitter_email": "test@example.com",
+            "source_url": "https://github.com/test/new-plugin",
+            "proposed_category": "lsp",
+            "proposed_config": {},
+        }
+        # First submission succeeds
+        resp1 = client.post("/api/v1/submissions", json=payload)
+        assert resp1.status_code == status.HTTP_201_CREATED
+        # Second submission with same URL fails
+        resp2 = client.post("/api/v1/submissions", json=payload)
+        assert resp2.status_code == status.HTTP_409_CONFLICT
+        assert "already exists" in resp2.json()["detail"]
+
+    def test_create_submission_existing_plugin_rejected(self, client):
+        # Try to submit a plugin that already exists in seed data
+        payload = {
+            "submitter_name": "Test User",
+            "submitter_email": "test@example.com",
+            "source_url": "https://github.com/microsoft/pyright",
+            "proposed_category": "lsp",
+            "proposed_config": {},
+        }
+        resp = client.post("/api/v1/submissions", json=payload)
+        assert resp.status_code == status.HTTP_409_CONFLICT
+        assert "already exists" in resp.json()["detail"]
+
+    def test_create_submission_invalid_email_rejected(self, client):
+        payload = {
+            "submitter_name": "Test User",
+            "submitter_email": "not-an-email",
+            "source_url": "https://github.com/test/new-plugin-2",
+            "proposed_category": "lsp",
+            "proposed_config": {},
+        }
+        resp = client.post("/api/v1/submissions", json=payload)
+        assert resp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    def test_create_submission_invalid_category_rejected(self, client):
+        payload = {
+            "submitter_name": "Test User",
+            "submitter_email": "test@example.com",
+            "source_url": "https://github.com/test/new-plugin-3",
+            "proposed_category": "invalid-category",
+            "proposed_config": {},
+        }
+        resp = client.post("/api/v1/submissions", json=payload)
+        assert resp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    def test_list_submissions_empty_initially(self, client):
+        # Note: seed data may create some submissions, so we just check it returns a list
+        resp = client.get("/api/v1/submissions")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert isinstance(data, list)
+
+    def test_list_submissions_filter_by_status(self, client):
+        # Create a pending submission first
+        payload = {
+            "submitter_name": "Filter Test",
+            "submitter_email": "filter@example.com",
+            "source_url": "https://github.com/test/filter-plugin",
+            "proposed_category": "tool",
+            "proposed_config": {},
+        }
+        client.post("/api/v1/submissions", json=payload)
+        # Filter by pending
+        resp = client.get("/api/v1/submissions?status=pending")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert all(s["status"] == "pending" for s in data)
+        # Filter by approved (should be empty or not include our pending)
+        resp = client.get("/api/v1/submissions?status=approved")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert all(s["status"] == "approved" for s in data)
+
+    def test_review_submission_approve_creates_plugin(self, client):
+        payload = {
+            "submitter_name": "Approve Test",
+            "submitter_email": "approve@example.com",
+            "source_url": "https://github.com/test/approve-plugin",
+            "proposed_category": "mcp",
+            "proposed_config": {
+                "name": "Approve Test Plugin",
+                "slug": "approve-test-plugin",
+                "description": "Plugin to approve",
+                "version": "2.0.0",
+                "author": "Approve Test",
+                "tags": ["mcp"],
+            },
+        }
+        create_resp = client.post("/api/v1/submissions", json=payload)
+        assert create_resp.status_code == status.HTTP_201_CREATED
+        submission_id = create_resp.json()["id"]
+
+        # Approve the submission
+        review_payload = {"status": "approved", "reviewer_notes": "Looks good"}
+        resp = client.patch(f"/api/v1/submissions/{submission_id}/review", json=review_payload)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["status"] == "approved"
+        assert data["reviewer_notes"] == "Looks good"
+        assert data["plugin_id"] is not None
+
+        # Verify plugin was created
+        plugin_resp = client.get(f"/api/v1/plugins/{data['plugin_id']}")
+        assert plugin_resp.status_code == 200
+        plugin = plugin_resp.json()
+        assert plugin["name"] == "Approve Test Plugin"
+        assert plugin["slug"] == "approve-test-plugin"
+        assert plugin["category"] == "mcp"
+
+    def test_review_submission_reject(self, client):
+        payload = {
+            "submitter_name": "Reject Test",
+            "submitter_email": "reject@example.com",
+            "source_url": "https://github.com/test/reject-plugin",
+            "proposed_category": "utility",
+            "proposed_config": {},
+        }
+        create_resp = client.post("/api/v1/submissions", json=payload)
+        assert create_resp.status_code == status.HTTP_201_CREATED
+        submission_id = create_resp.json()["id"]
+
+        # Reject the submission
+        review_payload = {"status": "rejected", "reviewer_notes": "Does not meet guidelines"}
+        resp = client.patch(f"/api/v1/submissions/{submission_id}/review", json=review_payload)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["status"] == "rejected"
+        assert data["reviewer_notes"] == "Does not meet guidelines"
+        assert data["plugin_id"] is None
+
+    def test_review_nonexistent_submission_returns_404(self, client):
+        review_payload = {"status": "approved", "reviewer_notes": ""}
+        resp = client.patch("/api/v1/submissions/99999/review", json=review_payload)
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_review_already_reviewed_submission_returns_400(self, client):
+        payload = {
+            "submitter_name": "Double Review",
+            "submitter_email": "double@example.com",
+            "source_url": "https://github.com/test/double-plugin",
+            "proposed_category": "lsp",
+            "proposed_config": {},
+        }
+        create_resp = client.post("/api/v1/submissions", json=payload)
+        submission_id = create_resp.json()["id"]
+
+        # First review
+        client.patch(f"/api/v1/submissions/{submission_id}/review", json={"status": "approved"})
+        # Second review should fail
+        resp = client.patch(f"/api/v1/submissions/{submission_id}/review", json={"status": "rejected"})
+        assert resp.status_code == status.HTTP_400_BAD_REQUEST
+        assert "already approved" in resp.json()["detail"]
+
+    def test_review_invalid_status_rejected(self, client):
+        payload = {
+            "submitter_name": "Invalid Status",
+            "submitter_email": "invalid@example.com",
+            "source_url": "https://github.com/test/invalid-plugin",
+            "proposed_category": "lsp",
+            "proposed_config": {},
+        }
+        create_resp = client.post("/api/v1/submissions", json=payload)
+        submission_id = create_resp.json()["id"]
+
+        resp = client.patch(f"/api/v1/submissions/{submission_id}/review", json={"status": "invalid"})
+        assert resp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

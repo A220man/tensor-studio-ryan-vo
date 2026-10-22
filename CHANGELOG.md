@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.0.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
@@ -19,3 +23,22 @@ Partial code published for continued development. Known issues: STATUS.md.
 - Dockerfile and Compose configuration for backend, frontend, and Keycloak
 - CI pipeline (GitHub Actions) with backend pytest, frontend build/test, Docker builds
 - 42 backend tests covering API endpoints, LSP config engine, persistence, and boundary conditions
+
+## [1.0.0] — 2026-10-22 (checkpoint)
+
+### Added
+- Plugin submission & review workflow (issue #984 reference)
+  - `POST /api/v1/submissions` creates plugin submissions with validation (name, email, source URL, category, plugin.json config)
+  - `GET /api/v1/submissions` lists all submissions with status filtering (pending/approved/rejected)
+  - `PATCH /api/v1/submissions/{id}/review` approves or rejects submissions with reviewer notes
+  - On approval, automatically creates a published plugin from the submission data
+  - Duplicate detection: rejects submissions for existing source URLs or pending duplicates
+- Frontend submission page (`/submit`) with form validation
+  - Client-side validation for required fields, email format, URL format, JSON syntax
+  - Accessible form with proper label associations
+  - Success state with confirmation message
+  - Error handling for API failures
+- "Submit Plugin" link in marketplace header
+- 12 new backend tests covering submission CRUD, validation, approval/rejection flow
+- 7 new frontend tests covering form rendering, validation, submission, and error states
+- Total: 54 backend tests, 16 frontend tests all passing

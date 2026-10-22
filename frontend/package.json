@@ -1,1 +1,43 @@
-{"name":"tensor-studio-frontend","version":"1.0.0","private":true,"description":"Tensor Studio — Claude Code plugin marketplace frontend","type":"module","scripts":{"dev":"vite","build":"tsc --noEmit && vite build","test":"vitest run","lint":"eslint src --ext ts,tsx","preview":"vite preview"},"authors":[{"name":"Ryan Vo","email":"ryandtvo@gmail.com"}],"dependencies":{"react":"^18.3.1","react-dom":"^18.3.1","react-router-dom":"^6.28.0"},"devDependencies":{"@testing-library/jest-dom":"^7.0.1","@testing-library/react":"^16.3.3","@testing-library/user-event":"^14.6.8","@types/jsdom":"^30.0.0","@types/react":"^18.3.14","@types/react-dom":"^18.3.1","@vitejs/plugin-react":"^5.1.2","jsdom":"^30.1.3","typescript":"^5.7.3","vite":"^6.0.1","vitest":"^2.1.5"}}
+{
+  "name": "tensor-studio-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tensor Studio \u2014 Claude Code plugin marketplace frontend",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "lint": "eslint src --ext ts,tsx",
+    "preview": "vite preview"
+  },
+  "authors": [
+    {
+      "name": "Ryan Vo",
+      "email": "ryandtvo@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "@types/jsdom": "^30.0.0",
+    "@types/react": "^18.3.14",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^5.1.2",
+    "jsdom": "^30.1.3",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.1",
+    "vitest": "^2.1.5"
+  },
+  "author": {
+    "name": "Ryan Vo",
+    "email": "ryandtvo@gmail.com",
+    "url": "https://github.com/A220man"
+  }
+}

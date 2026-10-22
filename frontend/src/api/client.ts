@@ -11,6 +11,9 @@ import type {
   PluginDetail,
   PluginListParams,
   PaginatedResponse,
+  PluginSubmissionCreate,
+  PluginSubmissionRead,
+  PluginSubmissionReview,
 } from "../types";
 
 const DEFAULT_BASE_URL = "http://127.0.0.1:8000/api/v1";
@@ -76,4 +79,27 @@ export async function fetchPluginBySlug(slug: string): Promise<PluginDetail> {
 /** Fetch the generated ``.lsp.json`` for a plugin. */
 export async function fetchLspConfig(pluginId: number): Promise<LspConfig> {
   return api<LspConfig>(`/plugins/${pluginId}/lsp-config`);
+}
+/** Create a new plugin submission. */
+export async function createSubmission(payload: PluginSubmissionCreate): Promise<PluginSubmissionRead> {
+  return api<PluginSubmissionRead>("/submissions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+/** Fetch all plugin submissions (admin). */
+export async function fetchSubmissions(status?: string): Promise<PluginSubmissionRead[]> {
+  const query = status ? `?status=${encodeURIComponent(status)}` : "";
+  return api<PluginSubmissionRead[]>(`/submissions${query}`);
+}
+
+/** Review a plugin submission (approve/reject). */
+export async function reviewSubmission(submissionId: number, payload: PluginSubmissionReview): Promise<PluginSubmissionRead> {
+  return api<PluginSubmissionRead>(`/submissions/${submissionId}/review`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 }
