@@ -74,3 +74,30 @@ export interface PluginListParams {
   page?: number;
   page_size?: number;
 }
+export interface PluginSubmissionCreate {
+  submitter_name: string;
+  submitter_email: string;
+  source_url: string;
+  proposed_category: PluginCategory;
+  proposed_config?: Record<string, unknown>;
+}
+
+export interface PluginSubmissionRead {
+  id: number;
+  plugin_id: number | null;
+  submitter_name: string;
+  submitter_email: string;
+  source_url: string;
+  proposed_category: PluginCategory;
+  proposed_config: Record<string, unknown> | null;
+  status: "pending" | "approved" | "rejected";
+  reviewer_notes: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PluginSubmissionReview {
+  status: "approved" | "rejected";
+  reviewer_notes?: string;
+}

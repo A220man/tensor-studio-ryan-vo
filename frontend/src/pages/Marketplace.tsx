@@ -82,18 +82,23 @@ export default function Marketplace() {
           initialValue={search}
           onSearch={(q) => updateParam("search", q)}
         />
-        <select
-          className="input"
-          style={{ maxWidth: "200px" }}
-          value={category}
-          onChange={(e) => updateParam("category", e.target.value)}
-        >
-          {CATEGORIES.map((c) => (
-            <option key={c.value} value={c.value}>
-              {c.label}
-            </option>
-          ))}
-        </select>
+        <div className="flex gap-2">
+          <select
+            className="input"
+            style={{ maxWidth: "200px" }}
+            value={category}
+            onChange={(e) => updateParam("category", e.target.value)}
+          >
+            {CATEGORIES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+          <a href="/submit" className="btn btn-sm">
+            Submit Plugin
+          </a>
+        </div>
       </div>
 
       {items.length === 0 ? (

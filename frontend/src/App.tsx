@@ -1,6 +1,7 @@
 import { Routes, Route, Link } from "react-router-dom";
 import Marketplace from "./pages/Marketplace";
 import PluginDetail from "./pages/PluginDetail";
+import SubmitPlugin from "./pages/SubmitPlugin";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Marketplace />} />
         <Route path="/plugins/:slug" element={<PluginDetail />} />
+        <Route path="/submit" element={<SubmitPlugin />} />
       </Routes>
     </div>
   );
