@@ -211,18 +211,25 @@ def review_submission(
     if payload.status == "approved":
         # Extract plugin data from proposed_config or use defaults
         config = submission.proposed_config or {}
+        now = datetime.now()
         plugin = Plugin(
             slug=config.get("slug", submission.source_url.rstrip("/").split("/")[-1].lower().replace("_", "-")),
             name=config.get("name", "Unnamed Plugin"),
             description=config.get("description", ""),
+            long_description=config.get("long_description"),
             category=submission.proposed_category,
             status=PluginStatus.PUBLISHED,
             author=config.get("author", submission.submitter_name),
+            author_email=config.get("author_email"),
+            license=config.get("license"),
             version=config.get("version", "1.0.0"),
             tags=config.get("tags", []),
             source_url=submission.source_url,
+            install_command=config.get("install_command"),
+            registry_name=config.get("registry_name"),
             plugin_config=config,
             lsp_servers=config.get("lspServers"),
+            published_at=now,
         )
         db.add(plugin)
         db.flush()  # Get the plugin ID

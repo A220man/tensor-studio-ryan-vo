@@ -20,3 +20,9 @@ data/*.sqlite3
 .DS_Store
 *.log
 venv/
+*.db-wal
+*.db-shm
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
