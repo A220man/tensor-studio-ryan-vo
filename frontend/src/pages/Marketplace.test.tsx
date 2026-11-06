@@ -82,4 +82,44 @@ describe("Marketplace page", () => {
       expect(screen.getByText("No plugins found matching your criteria.")).toBeDefined();
     });
   });
+
+  it("renders Has LSP Config checkbox and calls fetchPlugins with has_lsp=true when checked", async () => {
+    const fetchSpy = vi.spyOn(api, "fetchPlugins").mockResolvedValue(MOCK_RESPONSE);
+
+    render(
+      <MemoryRouter initialEntries={["/marketplace?has_lsp=true"]}>
+        <Marketplace />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("TypeScript Language Server")).toBeDefined();
+    });
+
+    const checkbox = screen.getByRole("checkbox", { name: "Has LSP Config" });
+    expect(checkbox).toBeChecked();
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ has_lsp: true })
+    );
+  });
+
+  it("renders Has LSP Config checkbox unchecked by default and calls fetchPlugins with has_lsp=undefined", async () => {
+    const fetchSpy = vi.spyOn(api, "fetchPlugins").mockResolvedValue(MOCK_RESPONSE);
+
+    render(
+      <MemoryRouter initialEntries={["/marketplace"]}>
+        <Marketplace />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("TypeScript Language Server")).toBeDefined();
+    });
+
+    const checkbox = screen.getByRole("checkbox", { name: "Has LSP Config" });
+    expect(checkbox).not.toBeChecked();
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ has_lsp: undefined })
+    );
+  });
 });

@@ -1,7 +1,20 @@
 # Changelog
 
+## 1.4.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.3.0 — work-in-progress checkpoint
 
+### Added
+- "Has LSP Config" filter checkbox in marketplace browse page
+  - New checkbox filter alongside existing category dropdown
+  - Persists filter state in URL query params (`has_lsp=true`)
+  - Backend already supported `has_lsp` filter; now exposed in UI
+  - 2 new frontend tests for checkbox rendering and filter behavior
+  - Total: 54 backend tests, 18 frontend tests all passing
+
+Partial code published for continued development. Known issues: STATUS.md.
 Partial code published for continued development. Known issues: STATUS.md.
 
 ## 1.2.0 — work-in-progress checkpoint

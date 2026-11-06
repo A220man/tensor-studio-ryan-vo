@@ -95,6 +95,14 @@ export default function Marketplace() {
               </option>
             ))}
           </select>
+          <label className="flex items-center gap-2 cursor-pointer" style={{ marginTop: "auto" }}>
+            <input
+              type="checkbox"
+              checked={has_lsp === "true"}
+              onChange={(e) => updateParam("has_lsp", e.target.checked ? "true" : "")}
+            />
+            <span className="text-sm">Has LSP Config</span>
+          </label>
           <a href="/submit" className="btn btn-sm">
             Submit Plugin
           </a>
