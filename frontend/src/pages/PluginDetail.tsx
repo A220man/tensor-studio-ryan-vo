@@ -119,7 +119,18 @@ export default function PluginDetailPage() {
 
         {lspConfig && (
           <div className="mt-4">
-            <h3>.lsp.json Configuration</h3>
+            <div className="flex-between mb-2">
+              <h3>.lsp.json Configuration</h3>
+              <button
+                className="btn btn-sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(JSON.stringify(lspConfig, null, 2));
+                }}
+                title="Copy .lsp.json to clipboard"
+              >
+                Copy
+              </button>
+            </div>
             <pre
               className="text-sm"
               style={{
