@@ -1,6 +1,6 @@
 {
   "name": "tensor-studio-frontend",
-  "version": "1.0.0",
+  "version": "1.6.0",
   "private": true,
   "description": "Tensor Studio \u2014 Claude Code plugin marketplace frontend",
   "type": "module",
