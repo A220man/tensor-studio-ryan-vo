@@ -1,0 +1,1 @@
+#!/usr/bin/env python3\n\nimport logging\n\nfrom fastapi import FastAPI\n\napp = FastAPI(title="test")\n\n@app.get("/")\nasync def root():\n    return {"message": "Hello World"}

@@ -17,6 +17,8 @@ from app.models.plugin import (
     PluginSubmissionReview,
 )
 
+from app.models.auth import User, Session
+
 __all__ = [
     "Plugin",
     "PluginSubmission",
@@ -34,4 +36,6 @@ __all__ = [
     "PluginSubmissionCreate",
     "PluginSubmissionRead",
     "PluginSubmissionReview",
+    "User",
+    "Session",
 ]
