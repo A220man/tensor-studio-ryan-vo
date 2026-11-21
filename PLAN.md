@@ -4,7 +4,7 @@ Each round completes one feature or repair. Future items are planned, not implem
 
 ## Current round
 
-plugin-submission
+auth-oidc
 
 ## Roadmap
 
@@ -53,13 +53,19 @@ Tests: `backend/tests/test_plugins.py::TestPluginSubmission`, `frontend/src/page
 
 ### auth-oidc — OIDC Authentication with Keycloak
 
-Status: planned
+Status: in_progress
 
 Acceptance:
-- Login/logout via Keycloak authorization code flow with PKCE
-- HttpOnly SameSite cookies for session, CSRF protection on writes
-- Role-based access: viewer, submitter, admin
-- Protected endpoints reject unauthenticated/invalid-role requests
+- PKCE S256 verifier/challenge generation per RFC 7636 with correct length and alphabet
+- Authorization-code callback validation: state CSRF match, provider error handling, PKCE verifier presence
+- Login/logout via Keycloak authorization code flow with PKCE (remaining)
+- HttpOnly SameSite cookies for session, CSRF protection on writes (remaining)
+- Role-based access: viewer, submitter, admin (remaining)
+- Protected endpoints reject unauthenticated/invalid-role requests (remaining)
+
+Implementation: `backend/app/main.py (restored app factory: routers mounted, startup init/seed)`, `backend/app/api/auth.py (PKCE + callback validation helpers)`
+
+Tests: `backend/tests/test_auth.py`
 
 ### docker-ci — Docker Compose & CI Pipeline
 
