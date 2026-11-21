@@ -1,6 +1,31 @@
 # Changelog
 
+## 1.7.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.6.0 — work-in-progress checkpoint
+
+### Fixed
+- `backend/app/main.py` was a one-line stub in the published checkpoint; the
+  `create_app()` factory is restored (CORS, plugin router, `/healthz`, startup
+  schema init and seeding). The backend could not be imported or served before.
+- `app/__init__.py` imported the auth router, which failed at import time on
+  `from app.models.auth import ... Role ...` (no such symbol). Fixed.
+- Removed the committed scratch file `backend/app/main.pyn`.
+
+### Added
+- `backend/app/api/auth.py`: PKCE S256 verifier/challenge generation
+  (`generate_pkce_verifier`, `generate_pkce_challenge`, `generate_pkce_pair`),
+  constant-time `verify_pkce` (rejects `plain`), and RFC 6749 §4.1.2 callback
+  validation (`validate_callback_params`) covering provider `error`, state CSRF
+  match and mandatory PKCE verifier, plus `parse_callback_params`.
+- `backend/tests/test_auth.py`: 18 targeted tests for the above.
+
+### Notes
+- OIDC login/logout is still **not** implemented; `auth-oidc` stays
+  `in_progress` with the remaining steps listed in PLAN.md.
+- 72 backend tests pass; no live Keycloak run this round.
 
 Partial code published for continued development. Known issues: STATUS.md.
 
