@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import random
 import secrets
 from dataclasses import dataclass
 from urllib.parse import parse_qs
@@ -27,9 +28,7 @@ router = APIRouter(tags=["auth"])
 # RFC 7636 §4.1: code_verifier is 43-128 chars of [A-Za-z0-9-._~].
 PKCE_MIN_VERIFIER_LENGTH = 43
 PKCE_MAX_VERIFIER_LENGTH = 128
-_VERIFIER_ALPHABET = frozenset(
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"
-)
+_VERIFIER_ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.', '_', '~']
 
 
 @dataclass(frozen=True)
@@ -42,12 +41,14 @@ class PKCEPair:
 
 
 def generate_pkce_verifier() -> str:
-    """Return a cryptographically random PKCE ``code_verifier``.
+    """Return a cryptographically random PKCE ``code_verifier`` per RFC 7636 §4.1.
 
-    ``secrets.token_urlsafe`` only emits the URL-safe alphabet
-    (``A-Za-z0-9-_``), which is a subset of the RFC 7636 alphabet.
+    The verifier is randomly drawn from the ``[A-Za-z0-9-._~]`` alphabet
+    with a length between ``PKCE_MIN_VERIFIER_LENGTH`` and
+    ``PKCE_MAX_VERIFIER_LENGTH`` (inclusive).
     """
-    return secrets.token_urlsafe(64)[:PKCE_MAX_VERIFIER_LENGTH]
+    length = random.randrange(PKCE_MIN_VERIFIER_LENGTH, PKCE_MAX_VERIFIER_LENGTH + 1)
+    return ''.join(secrets.choice(_VERIFIER_ALPHABET) for _ in range(length))
 
 
 def generate_pkce_challenge(verifier: str) -> str:
